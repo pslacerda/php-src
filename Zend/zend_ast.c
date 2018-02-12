@@ -1253,6 +1253,7 @@ simple_list:
 				case T_METHOD_C: APPEND_STR("__METHOD__");
 				case T_FUNC_C:   APPEND_STR("__FUNCTION__");
 				case T_NS_C:     APPEND_STR("__NAMESPACE__");
+				case T_ST_C:     APPEND_STR("__STRICT_TYPES__");
 				case T_CLASS_C:  APPEND_STR("__CLASS__");
 				EMPTY_SWITCH_DEFAULT_CASE();
 			}

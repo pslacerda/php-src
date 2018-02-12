@@ -478,8 +478,9 @@ $test_results = array();
 $PHP_FAILED_TESTS = array('BORKED' => array(), 'FAILED' => array(), 'WARNED' => array(), 'LEAKED' => array(), 'XFAILED' => array(), 'SLOW' => array());
 
 // If parameters given assume they represent selected tests to run.
-$result_tests_file= false;
-$failed_tests_file= false;
+$result_tests_file = false;
+$failed_tests_file = false;
+$with_strict_types = false;
 $pass_option_n = false;
 $pass_options = '';
 
@@ -601,6 +602,9 @@ if (isset($argc) && $argc > 1) {
 				case 'm':
 					$valgrind = new RuntestsValgrind($environment);
 					break;
+				case 't':
+					$with_strict_types = true;
+					break;
 				case 'n':
 					if (!$pass_option_n) {
 						$pass_options .= ' -n';
@@ -718,6 +722,8 @@ Options:
                 (possible values: PASS, FAIL, XFAIL, SKIP, BORK, WARN, LEAK, REDIRECT).
 
     -m          Test for memory leaks with Valgrind.
+	
+    -t          Force running tests with strict types enabled
 
     -p <php>    Specify PHP executable to run.
 
@@ -1051,6 +1057,14 @@ function mail_qa_team($data, $status = false)
 
 
 //
+//  Insert ' declare(strict_types=1);' after '<?php'
+//
+function insert_declare_strict_types($text) {
+	return substr_replace($text, " declare(strict_types=1);", 5, 0);
+}
+
+
+//
 //  Write the given text to a temporary file, and return the filename.
 //
 
@@ -1240,6 +1254,7 @@ function run_test($php, $file, $env)
 	global $SHOW_ONLY_GROUPS;
 	global $no_file_cache;
 	global $slow_min_ms;
+	global $with_strict_types;
 	$temp_filenames = null;
 	$org_file = $file;
 
@@ -1594,8 +1609,12 @@ TEST $file
 	$warn = false;
 
 	if (array_key_exists('SKIPIF', $section_text)) {
-
 		if (trim($section_text['SKIPIF'])) {
+
+			if ($with_strict_types) {
+				$section_text['SKIPIF'] = insert_declare_strict_types($section_text['SKIPIF']);
+			}
+
 			show_file_block('skip', $section_text['SKIPIF']);
 			save_text($test_skipif, $section_text['SKIPIF'], $temp_skipif);
 			$extra = substr(PHP_OS, 0, 3) !== "WIN" ?
@@ -1743,6 +1762,9 @@ TEST $file
 
 	// We've satisfied the preconditions - run the test!
 	if (isset($section_text['FILE'])) {
+		if ($with_strict_types) {
+			$section_text['FILE'] = insert_declare_strict_types($section_text['FILE']);
+		}
 		show_file_block('php', $section_text['FILE'], 'TEST');
 		save_text($test_file, $section_text['FILE'], $temp_file);
 	} else {

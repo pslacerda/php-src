@@ -1,5 +1,7 @@
 --TEST--
 Test timezone_transitions_get() function : usage variation - Passing unexpected values to first argument $timestamp_env.
+--SKIPIF--
+<?php if (__STRICT_TYPES__) die("skip strict_types is not enabled"); ?>
 --FILE--
 <?php
 /* Prototype  : array timezone_transitions_get  ( DateTimeZone $object, [ int $timestamp_begin  [, int $timestamp_end  ]]  )

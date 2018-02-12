@@ -6933,6 +6933,9 @@ static zend_bool zend_try_ct_eval_magic_const(zval *zv, zend_ast *ast) /* {{{ */
 				ZVAL_EMPTY_STRING(zv);
 			}
 			break;
+		case T_ST_C:
+			ZVAL_BOOL(zv, CG(active_op_array)->fn_flags & ZEND_ACC_STRICT_TYPES);
+			break;
 		EMPTY_SWITCH_DEFAULT_CASE()
 	}
 
