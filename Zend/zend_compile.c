@@ -33,6 +33,7 @@
 #include "zend_language_scanner.h"
 #include "zend_inheritance.h"
 #include "zend_vm.h"
+#include "zend_ini.h"
 
 #define SET_NODE(target, src) do { \
 		target ## _type = (src)->op_type; \
@@ -3730,7 +3731,7 @@ int zend_compile_func_cuf(znode *result, zend_ast_list *args, zend_string *lcnam
 
 static int zend_compile_assert(znode *result, zend_ast_list *args, zend_string *name, zend_function *fbc) /* {{{ */
 {
-	if (EG(assertions) >= 0) {
+	if (INI_BOOL("assert.active") && EG(assertions) >= 0) {
 		znode name_node;
 		zend_op *opline;
 		uint32_t check_op_number = get_next_op_number(CG(active_op_array));
